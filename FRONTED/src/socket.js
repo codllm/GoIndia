@@ -1,16 +1,18 @@
-import { io } from "socket.io-client";
+import { io } from 'socket.io-client';
 
-const socket = io("http://localhost:3060", {
-  transports: ["websocket"], // 🔥 important
-  autoConnect: true,
+
+const URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3060';
+
+export const socket = io(URL, {
+    transports: ['websocket'],
+    autoConnect: true,
 });
 
-socket.on("connect", () => {
-  console.log("🟢 SOCKET CONNECTED:", socket.id);
+
+socket.on('connect', () => {
+    console.log('Connected to backend at:', URL);
 });
 
-socket.on("disconnect", () => {
-  console.log("🔴 SOCKET DISCONNECTED");
+socket.on('connect_error', (err) => {
+    console.log('Socket Connection Error:', err.message);
 });
-
-export default socket;
