@@ -77,17 +77,18 @@ const LookingForDriver = () => {
     const rideId = localStorage.getItem("currentRide");
 
     if (!userId) {
-      console.log(" Waiting for user context...");
+      console.log("⏳ Waiting for user context...");
       return;
     }
 
     if (!rideId) {
-      console.log(" No currentRide in localStorage");
+      console.log("❌ No currentRide in localStorage");
       return;
     }
 
     const registerAndJoin = () => {
-    
+      console.log("📱 register-user →", userId, "| socket:", socket.id);
+      socket.emit("register-user", userId);
       socket.emit("join-ride", rideId.toString());
     };
 
@@ -120,12 +121,12 @@ const LookingForDriver = () => {
       console.log("   currentRide in LS:", String(currentRideId));
 
       if (!currentRideId) {
-        console.log(" No currentRide — ignoring");
+        console.log("❌ No currentRide — ignoring");
         return;
       }
 
       if (String(data.rideId) !== String(currentRideId)) {
-        console.log(" Not my ride — ignoring");
+        console.log("❌ Not my ride — ignoring");
         return;
       }
 
