@@ -1,3 +1,4 @@
+console.log("Connecting to Render...");
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -19,6 +20,7 @@ import UserProfile from "./pages/UserProfile";
 import CaptainProfile from "./pages/CaptainProfile";
 
 // depolyment update one
+console.log("Connecting to Render...");
 const App = () => {
   return (
     <BrowserRouter>
