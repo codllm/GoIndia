@@ -276,9 +276,12 @@ const UserArriving = () => {
     const handler = (ride) => {
       console.log("🏁 ride-ended event received:", ride);
   
-      
+    
   
       setrideCompleted(true);
+
+      localStorage.removeItem("currentRide");
+      
     };
   
     socket.on("ride-ended", handler);
@@ -636,6 +639,7 @@ const UserArriving = () => {
             rideData={rideData}
             role="user"
             navigateTo="/home"
+
           />
         )}
       </div>

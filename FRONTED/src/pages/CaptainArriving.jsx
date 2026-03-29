@@ -641,6 +641,7 @@ const CaptainArriving = () => {
         }
       );
       setrideCompleted(true);
+      localStorage.removeItem("currentRide");
     } catch (err) {
       console.log("END RIDE ERROR", err.message);
     }
