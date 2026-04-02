@@ -3,7 +3,7 @@ import LocationSearchPanel from "../components/LocationSearchPanel";
 import VehiclePanel from "../components/VehiclePanel";
 import ConfirmRide from "../components/ConformRide";
 import LookingForDriver from "../components/LokingForDriver";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, MapPin, Navigation, Search } from "lucide-react";
 import axios from "axios";
 import debounce from "lodash.debounce";
 import { RidingContext } from "../context/ridingDataContext";
@@ -11,11 +11,7 @@ import MapBg from "../components/mapBg";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
-  const [sheetPos, setSheetPos] = useState("down");
-  const [startY, setStartY] = useState(0);
-
   const navigate = useNavigate();
-
   const { setRideData } = useContext(RidingContext);
 
   const [currentpanel, Setcurentpanel] = useState("location");
@@ -29,26 +25,7 @@ const Home = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [activeField, setActiveField] = useState(null);
 
-  const positions = {
-    down: "-65%",
-    mid: "-35%",
-    up: "-5%",
-  };
-
-  const openSheet = () => setSheetPos("up");
-
-  const handleTouchStart = (e) => setStartY(e.touches[0].clientY);
-
-  const handleTouchEnd = (e) => {
-    const endY = e.changedTouches[0].clientY;
-    const diff = startY - endY;
-
-    if (diff > 50) setSheetPos("up");
-    else if (diff < -50) setSheetPos("down");
-  };
-
-// u come online send your location to backend n update
-
+  // u come online send your location to backend n update
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -56,17 +33,13 @@ const Home = () => {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         };
-
         fetchAddress(coords);
       },
-      (err) => {
-       
-      }
+      (err) => {}
     );
   }, []);
 
-  //GET SUGGESTIONS
-
+  // GET SUGGESTIONS
   const getsuggestion = async (input) => {
     if (!input) {
       setSuggestions([]);
@@ -84,11 +57,8 @@ const Home = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
       setSuggestions(response.data || []);
-    } catch (error) {
-
-    }
+    } catch (error) {}
   };
 
   const debouncedSuggestion = useCallback(
@@ -111,12 +81,10 @@ const Home = () => {
     };
   }, [debouncedSuggestion]);
 
-  /*SET RIDE DATA*/
-
+  /* SET RIDE DATA */
   useEffect(() => {
     if (pickup && destination) {
       const pickupName = typeof pickup === "string" ? pickup : pickup?.name;
-
       const destinationName =
         typeof destination === "string" ? destination : destination?.name;
 
@@ -133,12 +101,10 @@ const Home = () => {
     }
   }, [pickup, destination]);
 
-  /*REVERSE GEOCODING*/
-
+  /* REVERSE GEOCODING */
   const fetchAddress = async (coords) => {
     try {
       const token = localStorage.getItem("userToken");
-
       setPickupInput("Finding location...");
 
       const response = await axios.get(
@@ -158,9 +124,7 @@ const Home = () => {
         name: addressName,
         location: coords,
       });
-    } catch (err) {
-     
-    }
+    } catch (err) {}
   };
 
   const debouncedReverseGeocode = useCallback(
@@ -185,88 +149,88 @@ const Home = () => {
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-[#0f172a] text-white font-sans">
       {/* LOGO */}
-      <div className="absolute top-6 left-6 z-20">
-        <div className=" backdrop-blur-md p-3 rounded-2xl font-bold shadow-xl border border-white/5 text-black">
+      <div className="absolute top-6 left-6 z-40">
+        <div className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-2xl font-bold shadow-xl border border-white/20 text-slate-900 tracking-wide">
           GoIndia
         </div>
       </div>
 
-      {/* profile */}
-      <div className="absolute top-4 right-4 z-50">
-  <button
-    onClick={() => navigate('/user-profile')}
-    className="w-11 h-11 rounded-full overflow-hidden border-2 border-white shadow-lg bg-gray-200 flex items-center justify-center"
-  >
-    <img
-      src="https://api.dicebear.com/7.x/avataaars/svg?seed=$%7Buser.firstname%7D" // or user.profileImage
-      alt="profile"
-      className="w-full h-full object-cover"
-    />
-  </button>
-</div>
+      {/* PROFILE */}
+      <div className="absolute top-6 right-6 z-40">
+        <button
+          onClick={() => navigate("/user-profile")}
+          className="w-12 h-12 rounded-full overflow-hidden border-2 border-slate-700 shadow-xl bg-slate-800 flex items-center justify-center hover:scale-105 transition-transform"
+        >
+          <img
+            src="https://api.dicebear.com/7.x/avataaars/svg?seed=$%7Buser.firstname%7D"
+            alt="profile"
+            className="w-full h-full object-cover"
+          />
+        </button>
+      </div>
 
       {/* MAP */}
-      <div className="w-full h-full">
+      <div className="absolute inset-0 z-0">
         <MapBg onLocationChange={handleMapMove} currentpanel={currentpanel} />
       </div>
 
-      {/* BOTTOM SHEET */}
-      {currentpanel !== "confirm" && currentpanel !== "lookingForDriver" && (
-        <div
-          style={{ bottom: positions[sheetPos] }}
-          className="absolute left-0 w-full h-[90%] bg-black backdrop-blur-2xl rounded-t-[40px] transition-all duration-500 z-30"
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-        >
-          <div className="flex justify-center pt-3 pb-2">
-            <div className="w-12 h-1 bg-gray-600 rounded-full opacity-40"></div>
-          </div>
-
-          <div className="px-6 py-4">
-            <h2 className="text-2xl font-bold mb-8">
-              Where to?
+      {/* FLOATING UI PANEL (Replaces Bottom Sheet) */}
+      {currentpanel === "location" && (
+        <div className="absolute z-30 bottom-0 sm:bottom-auto sm:top-24 sm:left-6 w-full sm:w-[420px] bg-slate-900/95 backdrop-blur-2xl sm:rounded-3xl rounded-t-3xl border-t sm:border border-slate-700/50 shadow-2xl flex flex-col max-h-[85vh] transition-all duration-300">
+          <div className="p-6 flex-shrink-0">
+            <h2 className="text-2xl font-bold mb-6 text-white flex items-center gap-2">
+              <Search className="text-blue-400" size={24} /> Where to?
             </h2>
 
-            <div className="flex items-start gap-4">
-              <div className="flex flex-col items-center mt-6">
-                <div className="w-3 h-3 rounded-full border-2 border-blue-400"></div>
-                <div className="w-[2px] h-14 border-l-2 border-dashed border-gray-600 my-1"></div>
-                <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+            <div className="relative flex gap-4">
+              {/* Visual Route Connectors */}
+              <div className="flex flex-col items-center mt-4">
+                <div className="w-3 h-3 rounded-full border-2 border-blue-400 bg-slate-900 z-10"></div>
+                <div className="w-[2px] flex-1 border-l-2 border-dashed border-slate-600 my-1"></div>
+                <div className="w-3 h-3 rounded-full bg-emerald-400 border-2 border-emerald-400 z-10"></div>
               </div>
 
-              <div className="flex-1 space-y-3 ">
-                <input
-                  value={pickupInput}
-                  onFocus={() => {
-                    openSheet();
-                    setActiveField("pickup");
-                  }}
-                  onChange={(e) => {
-                    setPickupInput(e.target.value);
-                    debouncedSuggestion(e.target.value);
-                  }}
-                  placeholder="Current Location"
-                  className="w-full bg-white p-4 rounded-xl  text-black"
-                />
+              {/* Inputs */}
+              <div className="flex-1 space-y-4">
+                <div className="relative">
+                  <input
+                    value={pickupInput}
+                    onFocus={() => setActiveField("pickup")}
+                    onChange={(e) => {
+                      setPickupInput(e.target.value);
+                      debouncedSuggestion(e.target.value);
+                    }}
+                    placeholder="Current Location"
+                    className="w-full bg-slate-800 text-white placeholder-slate-400 p-4 pl-12 rounded-xl border border-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                  />
+                  <Navigation
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                    size={18}
+                  />
+                </div>
 
-                <input
-                  value={destinationInput}
-                  onFocus={() => {
-                    openSheet();
-                    setActiveField("destination");
-                  }}
-                  onChange={(e) => {
-                    setDestinationInput(e.target.value);
-                    debouncedSuggestion(e.target.value);
-                  }}
-                  placeholder="Enter destination"
-                  className="w-full bg-white p-4 rounded-xl text-black border-black"
-                />
+                <div className="relative">
+                  <input
+                    value={destinationInput}
+                    onFocus={() => setActiveField("destination")}
+                    onChange={(e) => {
+                      setDestinationInput(e.target.value);
+                      debouncedSuggestion(e.target.value);
+                    }}
+                    placeholder="Search destination..."
+                    className="w-full bg-slate-800 text-white placeholder-slate-400 p-4 pl-12 rounded-xl border border-slate-700 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
+                  />
+                  <MapPin
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                    size={18}
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          {currentpanel === "location" && (
+          {/* Location Suggestions (Scrollable area) */}
+          <div className="overflow-y-auto flex-1 custom-scrollbar px-6 pb-4">
             <LocationSearchPanel
               suggestions={suggestions}
               activeField={activeField}
@@ -275,24 +239,27 @@ const Home = () => {
               setPickupInput={setPickupInput}
               setDestinationInput={setDestinationInput}
             />
-          )}
+          </div>
         </div>
       )}
 
+      {/* VEHICLE PANEL */}
       {currentpanel === "vehicle" && (
-        <div className="absolute inset-x-0 bottom-0 z-[60]">
+        <div className="absolute z-30 bottom-0 sm:bottom-auto sm:top-24 sm:left-6 w-full sm:w-[420px] shadow-2xl">
           <VehiclePanel Setcurentpanel={Setcurentpanel} currentpanel={currentpanel} />
         </div>
       )}
 
+      {/* CONFIRM RIDE PANEL */}
       {currentpanel === "confirm" && (
-        <div className="absolute inset-x-0 bottom-0 z-[60]">
+        <div className="absolute z-30 bottom-0 sm:bottom-auto sm:top-24 sm:left-6 w-full sm:w-[420px] shadow-2xl">
           <ConfirmRide Setcurentpanel={Setcurentpanel} />
         </div>
       )}
 
+      {/* LOOKING FOR DRIVER PANEL */}
       {currentpanel === "lookingForDriver" && (
-        <div className="absolute inset-x-0 bottom-0 z-[60]">
+        <div className="absolute z-30 bottom-0 sm:bottom-auto sm:top-24 sm:left-6 w-full sm:w-[420px] shadow-2xl">
           <LookingForDriver />
         </div>
       )}

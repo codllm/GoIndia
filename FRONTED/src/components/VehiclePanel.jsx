@@ -1,11 +1,10 @@
 import React from "react";
 import axios from "axios";
 import { RidingContext } from "../context/ridingDataContext";
-import { User, ChevronRight } from "lucide-react"; // Install lucide-react
-import { motion } from "framer-motion"; // Install framer-motion for smooth UI
-import { ArrowLeft } from "lucide-react";
+import { User, ChevronRight, ArrowLeft } from "lucide-react";
+import { motion } from "framer-motion";
 
-const VehiclePanel = ({ Setcurentpanel,currentpanel }) => {
+const VehiclePanel = ({ Setcurentpanel, currentpanel }) => {
   const { rideData, setRideData } = React.useContext(RidingContext);
   const [fares, setFares] = React.useState({});
   const [loading, setLoading] = React.useState(false);
@@ -70,27 +69,27 @@ const VehiclePanel = ({ Setcurentpanel,currentpanel }) => {
   ];
 
   return (
-    <div className="w-full bg-black min-h-[60vh] px-4 py-6 text-slate-100 rounded-t-3xl shadow-2xl">
-      {/* Handle Bar for Mobile Feel */}
-      <div className="w-12 h-1.5 bg-slate-700 rounded-full mx-auto mb-6">
-    
-      </div>
-
-      <header className="mb-6 px-2">
-      {currentpanel !== "location" && (
-                <ArrowLeft
-                  className="float-end cursor-pointer"
-                  onClick={() => Setcurentpanel("location")}
-                />
-              )}
-        <h3 className="text-xl font-bold tracking-tight">Choose a ride</h3>
-        <p className="text-slate-400 text-sm">Recommended for your route</p>
+    <div className="w-full bg-slate-900/95 backdrop-blur-2xl sm:rounded-3xl rounded-t-3xl border-t sm:border border-slate-700/50 max-h-[85vh] overflow-y-auto px-4 py-6 text-slate-100">
+      
+      <header className="mb-6 px-2 flex items-center gap-4">
+        {currentpanel !== "location" && (
+          <button 
+            onClick={() => Setcurentpanel("location")}
+            className="p-2 hover:bg-slate-800 rounded-full transition-colors"
+          >
+            <ArrowLeft className="text-white" size={24} />
+          </button>
+        )}
+        <div>
+          <h3 className="text-2xl font-bold tracking-tight text-white">Choose a ride</h3>
+          <p className="text-slate-400 text-sm mt-1">Recommended for your route</p>
+        </div>
       </header>
 
       <div className="space-y-3">
         {vehicles.map((v, index) => (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
             key={v.id}
@@ -104,12 +103,12 @@ const VehiclePanel = ({ Setcurentpanel,currentpanel }) => {
               }));
               Setcurentpanel("confirm");
             }}
-            className="group flex items-center justify-between p-4 border border-slate-700/50 hover:border-blue-500/50 active:scale-[0.98] transition-all rounded-2xl cursor-pointer"
+            className="group flex items-center justify-between p-4 bg-slate-800/50 border border-slate-700/50 hover:border-blue-500/50 hover:bg-slate-800 active:scale-[0.98] transition-all rounded-2xl cursor-pointer shadow-sm hover:shadow-md"
           >
             <div className="flex items-center gap-4">
-              <div className="relative">
+              <div className="relative bg-white/5 rounded-xl p-2">
                 <img
-                  className="h-14 w-20 object-contain group-hover:scale-110 transition-transform"
+                  className="h-12 w-16 object-contain group-hover:scale-110 transition-transform duration-300"
                   src={v.image}
                   alt={v.name}
                 />
@@ -117,34 +116,37 @@ const VehiclePanel = ({ Setcurentpanel,currentpanel }) => {
               
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-lg">{v.name}</span>
-                  <span className="flex items-center text-xs text-slate-400 bg-slate-700/50 px-2 py-0.5 rounded-full">
+                  <span className="font-semibold text-lg text-slate-100">{v.name}</span>
+                  <span className="flex items-center text-xs text-slate-300 bg-slate-700 px-2 py-0.5 rounded-full font-medium">
                     <User size={12} className="mr-1" /> {v.capacity}
                   </span>
                 </div>
-                <p className="text-xs text-slate-400 font-medium">• {v.desc}</p>
+                <p className="text-xs text-slate-400 mt-0.5">{v.desc}</p>
+                <p className="text-xs text-emerald-400 mt-1 font-medium">{v.time}</p>
               </div>
             </div>
 
             <div className="flex flex-col items-end gap-1">
-              <span className="text-lg font-bold text-white">
+              <span className="text-xl font-bold text-white tracking-tight">
                 {loading ? (
-                  <div className="h-5 w-12 bg-slate-700 animate-pulse rounded"></div>
+                  <div className="h-6 w-16 bg-slate-700 animate-pulse rounded"></div>
                 ) : fares[v.type] ? (
                   `₹${fares[v.type]}`
                 ) : (
                   "N/A"
                 )}
               </span>
-              <ChevronRight size={18} className="text-slate-500 group-hover:text-blue-400 transition-colors" />
+              <ChevronRight size={20} className="text-slate-500 group-hover:text-blue-400 transition-colors" />
             </div>
           </motion.div>
         ))}
       </div>
       
-      <p className="text-[10px] text-center text-slate-500 mt-6 px-4">
-        Fares are inclusive of taxes. Actual price may vary based on traffic and demand.
-      </p>
+      <div className="mt-6 pt-4 border-t border-slate-800">
+        <p className="text-xs text-center text-slate-500 px-4">
+          Fares are inclusive of taxes. Actual price may vary based on traffic and demand.
+        </p>
+      </div>
     </div>
   );
 };
