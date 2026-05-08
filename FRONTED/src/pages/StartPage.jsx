@@ -14,7 +14,7 @@ const Start = () => {
 
       <div className="absolute bottom-0 w-full bg-white rounded-t-3xl px-6 py-8 shadow-xl">
         <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-          Get started with Uber
+          Get started with Goindia
         </h2>
 
         <button
